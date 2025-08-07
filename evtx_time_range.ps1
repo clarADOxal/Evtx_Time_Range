@@ -1,21 +1,21 @@
 #/////////////////////////////////////////////////////////////////////////////////////////////
+cls
 $Name="EVTX_TIME_RANGE"
-$version="0.1"
-$Creation_Date = "08:09 07/08/2025"
+$version="0.2"
+$Creation_Date = "18:23 07/08/2025"
 
 #Delete unused method
 #--------------------
-$Creation_How = "Full ChatGPT"
+$Creation_How = "Full ChatGPT+Gemini+Humain Brain"
 
 #Logo Exemple
 #------------
-$Logo = " (\_/)`n (OvO)`n//uuu\\`nV\UUU/V`n ^^ ^^"
-$Logo = " "
+$Logo = "________  ________`n| EVTX |  | EVTX |`n|------|=>|------|`n|      |  |      |`n|______|  |______|`n"
 
 #Todo
 #----
 $Todo="Test"
-$Todo+=""
+$Todo+="Correct Picture creation"
 
 
 #Label
@@ -57,8 +57,11 @@ $results = @()
 
 foreach ($file in Get-ChildItem -Path $inputFolder -Filter *.evtx) {
     try {
-        $first = Get-WinEvent -Path $file.FullName -MaxEvents 1 | Sort-Object TimeCreated | Select-Object -First 1
+        $first = Get-WinEvent -Path $file.FullName -MaxEvents 1 -oldest| Sort-Object TimeCreated | Select-Object -First 1
         $last = Get-WinEvent -Path $file.FullName -MaxEvents 1 | Sort-Object TimeCreated -Descending | Select-Object -First 1
+
+write-host -fore green FIRST : $first.TimeCreated
+write-host -fore green last : $last.TimeCreated
 
         if ($first -and $last) {
             $results += [PSCustomObject]@{
