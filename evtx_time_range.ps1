@@ -1,8 +1,8 @@
 #/////////////////////////////////////////////////////////////////////////////////////////////
 cls
 $Name="EVTX_TIME_RANGE"
-$version="0.2"
-$Creation_Date = "18:23 07/08/2025"
+$version="0.3"
+$Creation_Date = "07:48 11/08/2025"
 
 #Delete unused method
 #--------------------
@@ -14,8 +14,9 @@ $Logo = "________  ________`n| EVTX |  | EVTX |`n|------|=>|------|`n|      |  |
 
 #Todo
 #----
-$Todo="Test"
-$Todo+="Correct Picture creation"
+$Todo="To Do"
+$Todo+="0.2_Add Vertical Time Line"
+$Todo+="0.1_Correct Picture creation"
 
 
 #Label
@@ -109,6 +110,38 @@ function Get-X([datetime]$date) {
 $gfx.DrawLine([System.Drawing.Pens]::Gray, 100, 30, $imgWidth - 100, 30)
 $gfx.DrawString($minDate.ToString("yyyy-MM-dd HH:mm"), $font, $brush, 100, 10)
 $gfx.DrawString($maxDate.ToString("yyyy-MM-dd HH:mm"), $font, $brush, $imgWidth - 200, 10)
+
+# Déterminer l'intervalle adapté
+$nbJours = ($maxDate - $minDate).TotalDays
+if ($nbJours -le 2) {
+    $tickUnit = [TimeSpan]::FromHours(1)   # graduations horaires
+    $format = "HH:mm"
+} elseif ($nbJours -le 90) {
+    $tickUnit = [TimeSpan]::FromDays(1)    # graduations journalières
+    $format = "yyyy-MM-dd"
+} elseif ($nbJours -le 365*3) {
+    $tickUnit = [TimeSpan]::FromDays(30)   # graduations mensuelles (approx)
+    $format = "yyyy-MM"
+} else {
+    $tickUnit = [TimeSpan]::FromDays(365)  # graduations annuelles
+    $format = "yyyy"
+}
+
+# Dessiner les barres verticales
+$penTicks = New-Object System.Drawing.Pen ([System.Drawing.Color]::LightGray), 1
+$labelBrush = [System.Drawing.Brushes]::DarkGray
+
+$tickDate = $minDate
+while ($tickDate -lt $maxDate) {
+    $xTick = Get-X $tickDate
+    # Ligne verticale sur toute la hauteur
+    $gfx.DrawLine($penTicks, $xTick, 30, $xTick, $imgHeight - 10)
+    # Légende en haut
+    $gfx.DrawString($tickDate.ToString($format), $font, $labelBrush, $xTick - 20, 35)
+    $tickDate = $tickDate.Add($tickUnit)
+}
+
+
 
 # Frise pour chaque fichier
 $i = 0
